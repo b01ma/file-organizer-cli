@@ -36,8 +36,15 @@ async function main() {
     try {
         await handler(args.slice(1));
     } catch (error) {
-        const targetPath = args[1] || process.cwd();
-        console.error(`Error: ${formatFsError(error, targetPath)}`);
+        console.error(`Error: ${formatCliError(error, args[1])}`);
         process.exit(1);
     }
+}
+
+function formatCliError(error, targetPath) {
+    if (error && typeof error === "object" && error.code) {
+        return formatFsError(error, targetPath || process.cwd());
+    }
+
+    return error instanceof Error ? error.message : String(error);
 }
